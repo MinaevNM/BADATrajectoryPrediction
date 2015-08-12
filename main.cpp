@@ -202,6 +202,12 @@ struct AircraftParams
 	// Standard descent CAS between 10,000 ft and Mach transition altitude, knots
 	double v_descent2;
 
+	// Standard climb CAS between 1,500/6,000 and 10,000 ft, knots
+	double v_climb1;
+
+	// Standard climb CAS between 10,000 ft and Mach transition altitude, knots
+	double v_climb2;
+
 	// Standard descent Mach number above Mach transition altitude 
 	double Mach_descent;
 
@@ -240,19 +246,58 @@ struct AircraftParams
 			return v_descent2;
 		}
 	}
+
+	double get_CAS_climb( double height_in_ft )
+	{
+		if (engine_type == "Jet")
+		{
+			if (height_in_ft < 1500)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[1];
+			if (height_in_ft < 3000)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[2];
+			if (height_in_ft < 4000)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[3];
+			if (height_in_ft < 5000)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[4];
+			if (height_in_ft < 6000)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[5];
+			if (height_in_ft < 10000)
+				return min(v_climb1, 250.);
+			return v_climb2;
+		}
+		else
+		{
+			if (height_in_ft < 500)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[6];
+			if (height_in_ft < 1000)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[7];
+			if (height_in_ft < 1500)
+				return minimum_speed_coeff * v_stall[TO] + climb_speed_incr[8];
+			if (height_in_ft < 10000)
+				return min(v_climb1, 250.);
+			return v_climb2;
+		}
+	}
 };
 
 void main()
 {
-	double heights[7] = {500, 1250, 1750, 2500, 4000, 9000, 15000};
+	double heights_descent[7] = {500,  1250, 1750, 2500, 4000, 9000, 15000};
+	double heights_climb[7]   = {1000, 2000, 3500, 4500, 5500, 9000, 15000};
 	AircraftParams Airbus_A306;
 	
 	Airbus_A306.engine_type  = "Jet";
 	Airbus_A306.v_stall[LD]  = 97;
+	Airbus_A306.v_stall[TO]  = 117;
 	Airbus_A306.v_descent1   = 250;
 	Airbus_A306.v_descent2   = 280;
+	Airbus_A306.v_climb1     = 250;
+	Airbus_A306.v_climb2     = 310;
 	Airbus_A306.Mach_descent = 0.79;
 
 	for (int i = 0; i < 7; i++)
-		cout << "CAS at descent at height of " << heights[i] << " ft is --- " << Airbus_A306.get_CAS_descent(heights[i]) << " knots" << endl; 
+		cout << "CAS at descent at height of " << heights_descent[i] << " ft is --- " << Airbus_A306.get_CAS_descent(heights_descent[i]) << " knots" << endl; 
+	cout << endl;
+	for (int i = 0; i < 7; i++)
+		cout << "CAS at climb at height of "   << heights_climb[i]   << " ft is --- " << Airbus_A306.get_CAS_climb(heights_climb[i])   << " knots" << endl;
 }
