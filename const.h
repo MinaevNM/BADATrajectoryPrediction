@@ -30,3 +30,13 @@ const double climb_speed_incr[9] = {0, 5, 10, 30, 60, 80, 20, 30, 35};
  * 7 - below 1500 ft for piston
  */
 const double descent_speed_incr[8] = {0, 5, 10, 20, 50, 5, 10, 20};
+
+/*
+ * Physical constants
+ */
+
+// Adiabatic index of air
+double air_index = 1.4;
+
+// Speed of sound, m/s
+double speed_of_sound = 340.294;
