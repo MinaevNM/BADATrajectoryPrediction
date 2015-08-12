@@ -1,8 +1,18 @@
-#include <iostream>
+	#include <iostream>
 #include <string>
+
+#include "const.h"
 
 using namespace std;
 
+/* 5 different configurations, specified with a stall speed */
+enum StallConfig
+{
+	TO, IC, CR, AP, LD
+};
+
+
+/* Aircraft representation structure */
 struct AircraftParams
 {
 	/*
@@ -85,7 +95,7 @@ struct AircraftParams
 	double parasite_coeff_landing_gear;
 
 	// Stall speed, knots
-	double v_stall;
+	double v_stall[5];
 
 	// Buffet onset lift coefficient - jet only
 	double buffet_onset_lift_coeff;
@@ -181,6 +191,22 @@ struct AircraftParams
 
 	// Length
 	double length;
+
+	/*
+	 * Methods
+	 */
+	/*
+	double get_CAS_descent( double height_in_ft )
+	{
+		if (engine_type == "Piston")
+		{
+			if (height_in_ft < 1000)
+				;
+		}
+		else
+			return 1;
+	}
+	*/
 };
 
 void main()
