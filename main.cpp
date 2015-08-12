@@ -193,22 +193,66 @@ struct AircraftParams
 	double length;
 
 	/*
+	 * Data from PTF file
+	 */
+
+	// Standard descent CAS between 3,000/6,000 and 10,000 ft, knots
+	double v_descent1;
+
+	// Standard descent CAS between 10,000 ft and Mach transition altitude, knots
+	double v_descent2;
+
+	// Standard descent Mach number above Mach transition altitude 
+	double Mach_descent;
+
+	/*
 	 * Methods
 	 */
-	/*
+
 	double get_CAS_descent( double height_in_ft )
 	{
 		if (engine_type == "Piston")
 		{
+			if (height_in_ft < 500)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[5];
 			if (height_in_ft < 1000)
-				;
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[6];
+			if (height_in_ft < 1500)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[7];
+			if (height_in_ft < 10000)
+				return v_descent1;
+			return v_descent2;
 		}
 		else
-			return 1;
+		{
+			if (height_in_ft < 1000)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[1];
+			if (height_in_ft < 1500)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[2];
+			if (height_in_ft < 2000)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[3];
+			if (height_in_ft < 3000)
+				return minimum_speed_coeff * v_stall[LD] + descent_speed_incr[4];
+			if (height_in_ft < 6000)
+				return min(v_descent1, 220.);
+			if (height_in_ft < 10000)
+				return min(v_descent1, 250.);
+			return v_descent2;
+		}
 	}
-	*/
 };
 
 void main()
 {
+	double heights[7] = {500, 1250, 1750, 2500, 4000, 9000, 15000};
+	AircraftParams Airbus_A306;
+	
+	Airbus_A306.engine_type  = "Jet";
+	Airbus_A306.v_stall[LD]  = 97;
+	Airbus_A306.v_descent1   = 250;
+	Airbus_A306.v_descent2   = 280;
+	Airbus_A306.Mach_descent = 0.79;
+
+	for (int i = 0; i < 7; i++)
+		cout << "CAS at descent at height of " << heights[i] << " ft is --- " << Airbus_A306.get_CAS_descent(heights[i]) << " knots" << endl; 
 }
